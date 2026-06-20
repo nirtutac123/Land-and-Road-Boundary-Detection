@@ -1,0 +1,37 @@
+{
+  "train": {
+    "split_name": "train.txt",
+    "total_entries": 88880,
+    "unique_drivers": 3,
+    "unique_frames": 88880,
+    "annotated_frames": 88587,
+    "total_lanes": 265438
+  },
+  "val": {
+    "split_name": "val.txt",
+    "total_entries": 9675,
+    "unique_drivers": 1,
+    "unique_frames": 9675,
+    "annotated_frames": 9610,
+    "total_lanes": 32465
+  },
+  "test": {
+    "split_name": "test.txt",
+    "total_entries": 34680,
+    "unique_drivers": 3,
+    "unique_frames": 34680,
+    "annotated_frames": 16978,
+    "total_lanes": 52056
+  },
+  "test_categories": {
+    "normal": 9621,
+    "crowd": 8113,
+    "hlight": 486,
+    "shadow": 930,
+    "noline": 4067,
+    "arrow": 890,
+    "curve": 422,
+    "cross": 3122,
+    "night": 7029
+  }
+}

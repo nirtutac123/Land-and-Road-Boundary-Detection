@@ -1,0 +1,15 @@
+# Exclude dataset as requested
+/data/
+
+# Local Python environment
+/.venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store

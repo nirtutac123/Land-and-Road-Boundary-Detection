@@ -1,0 +1,10 @@
+numpy
+pandas
+matplotlib
+pillow
+opencv-python-headless
+scikit-image
+scikit-learn
+pypdf
+gdown
+tqdm

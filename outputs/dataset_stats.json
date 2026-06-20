@@ -1,0 +1,24 @@
+{
+  "drivers": [
+    "100_30frame",
+    "193_90frame",
+    "37_30frame"
+  ],
+  "total_annotations": 0,
+  "test_categories": [
+    "test1_crowd",
+    "test3_shadow",
+    "test8_night",
+    "test4_noline",
+    "test6_curve",
+    "test7_cross",
+    "test0_normal",
+    "test5_arrow",
+    "test2_hlight"
+  ],
+  "split_breakdown": {
+    "train": 88880,
+    "val": 9675,
+    "test": 34680
+  }
+}
