@@ -1,0 +1,2 @@
+started_utc,ended_utc,elapsed_seconds,train_images_available,training_images_used,sampled_pixels,seed,model_file
+2026-06-22T07:42:33.038758+00:00,2026-06-22T07:42:33.762522+00:00,0.72,88542,32,105000,42,outputs/culane_pixel_classifier.joblib

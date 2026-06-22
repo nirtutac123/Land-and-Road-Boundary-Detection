@@ -12,7 +12,7 @@ if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 from culane_project.analysis import summarize_dataset
-from culane_project.dataset import load_list_entries
+from culane_project.dataset import available_entries, load_list_entries
 from culane_project.modeling import (
     aggregate_metrics,
     evaluate_model_on_entries,
@@ -27,7 +27,9 @@ OUTPUT_ROOT.mkdir(exist_ok=True)
 
 
 def sample_entries(split_name: str, count: int) -> list:
-    entries = load_list_entries(split_name)
+    entries = available_entries(load_list_entries(split_name))
+    if not entries:
+        raise FileNotFoundError(f"No locally available images were found for {split_name}.")
     if count >= len(entries):
         return entries
     step = max(len(entries) // count, 1)
@@ -59,9 +61,15 @@ def save_visual_reports() -> None:
 
 
 def train_and_evaluate() -> dict:
-    train_entries = load_list_entries("train.txt")
-    val_entries = load_list_entries("val.txt")
-    test_entries = load_list_entries("test.txt")
+    train_entries = available_entries(load_list_entries("train.txt"), require_mask=True)
+    val_entries = available_entries(load_list_entries("val.txt"), require_mask=True)
+    test_entries = available_entries(load_list_entries("test.txt"), require_mask=True)
+    for split_name, entries in (("train", train_entries), ("val", val_entries), ("test", test_entries)):
+        if not entries:
+            raise FileNotFoundError(
+                f"No local {split_name} samples with segmentation labels were found. "
+                "Check data/CULane and the laneseg_label directories."
+            )
 
     bundle = train_pixel_classifier(train_entries, max_images=24, max_pixels_per_image=3500, seed=42)
     plot_training_curves(bundle, OUTPUT_ROOT / "pixel_classifier_training_curve.png")
@@ -93,7 +101,7 @@ def train_and_evaluate() -> dict:
 
 
 def save_prediction_gallery(bundle) -> None:
-    val_entries = load_list_entries("val.txt")[:3]
+    val_entries = available_entries(load_list_entries("val.txt"), require_mask=True)[:3]
     items = []
     from culane_project.dataset import image_from_relative, mask_from_relative
     from culane_project.modeling import hough_lane_baseline, color_lane_baseline, predict_pixel_mask

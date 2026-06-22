@@ -28,6 +28,11 @@ def load_list_entries(split_name: str) -> list[SplitEntry]:
         parts = line.split()
         image_rel = parts[0]
         mask_rel = parts[1] if len(parts) > 1 and parts[1].startswith("/") else None
+        # CULane's plain train/val/test lists contain only image paths.  The
+        # segmentation labels live in a parallel directory, so discover them
+        # here instead of silently treating those samples as unlabelled.
+        if mask_rel is None:
+            mask_rel = infer_mask_relative_path(image_rel)
         labels = tuple(int(value) for value in parts[2:]) if len(parts) > 2 else None
         entries.append(SplitEntry(image_rel=image_rel, mask_rel=mask_rel, labels=labels))
     return entries
@@ -47,6 +52,16 @@ def resolve_mask_path(mask_rel: str | None) -> Path | None:
     return resolve_data_path(mask_rel)
 
 
+def infer_mask_relative_path(image_rel: str) -> str | None:
+    """Return the available segmentation-mask path for an image, if any."""
+    relative = Path(image_rel.lstrip("/")).with_suffix(".png")
+    for mask_root in ("laneseg_label_w16", "laneseg_label_w16_test"):
+        candidate = DATA_ROOT / mask_root / relative
+        if candidate.is_file():
+            return "/" + str(Path(mask_root) / relative)
+    return None
+
+
 def parse_lane_annotation(path: Path) -> list[np.ndarray]:
     lanes: list[np.ndarray] = []
     for raw_line in path.read_text().splitlines():
@@ -60,6 +75,14 @@ def parse_lane_annotation(path: Path) -> list[np.ndarray]:
 
 
 def annotation_path_from_image(image_path: Path) -> Path:
+    """Resolve a CULane line annotation in either supported dataset layout."""
+    try:
+        relative = image_path.relative_to(DATA_ROOT).with_suffix(".lines.txt")
+        curated_annotation = DATA_ROOT / "annotations_new" / relative
+        if curated_annotation.is_file():
+            return curated_annotation
+    except ValueError:
+        pass
     return image_path.with_suffix(".lines.txt")
 
 
@@ -68,7 +91,24 @@ def image_from_relative(image_rel: str) -> Image.Image:
 
 
 def mask_from_relative(mask_rel: str) -> Image.Image:
-    return Image.open(resolve_mask_path(mask_rel)).convert("L")
+    path = resolve_mask_path(mask_rel)
+    if path is None:
+        raise ValueError("A segmentation-mask path is required.")
+    return Image.open(path).convert("L")
+
+
+def available_entries(entries: Iterable[SplitEntry], require_mask: bool = False) -> list[SplitEntry]:
+    """Keep entries whose local files are present (datasets are often partial)."""
+    available: list[SplitEntry] = []
+    for entry in entries:
+        if not resolve_image_path(entry.image_rel).is_file():
+            continue
+        if require_mask:
+            mask_path = resolve_mask_path(entry.mask_rel)
+            if mask_path is None or not mask_path.is_file():
+                continue
+        available.append(entry)
+    return available
 
 
 def extract_driver_name(image_rel: str) -> str:

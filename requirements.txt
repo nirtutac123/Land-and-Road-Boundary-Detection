@@ -5,6 +5,7 @@ pillow
 opencv-python-headless
 scikit-image
 scikit-learn
+scipy
 pypdf
 gdown
 tqdm

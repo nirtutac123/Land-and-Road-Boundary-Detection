@@ -85,20 +85,17 @@ Generates interactive HTML overlays of lane annotations on images for all splits
 
 Implemented **3 detection approaches**:
 
-#### Model 1: PolyFit Baseline
-- Fit cubic polynomials to lane points
-- **Metrics:** Accuracy 77.36%, F1 0.6204
+#### Model 1: Hough Transform Baseline
+- Canny edge detection followed by probabilistic Hough lines
 - Lightweight, interpretable baseline
 
-#### Model 2: CNN Segmentation ⭐ Best F1-Score
-- Pixel-level lane detection via CNN
-- **Metrics:** Accuracy 82.62%, F1 0.7890
-- Better handles irregular patterns and occlusions
+#### Model 2: Color-Threshold Baseline
+- HSV white/yellow lane-marking thresholding
+- Fast, training-free comparison point
 
-#### Model 3: Classical Edge + Hough ⭐ Best Accuracy
-- Canny edge detection → Hough lines
-- **Metrics:** Accuracy 84.88%, F1 0.7239
-- Fast, no training, works offline
+#### Model 3: Pixel Classifier
+- Histogram-gradient-boosting pixel segmentation using RGB and pixel position
+- Trained on locally available CULane segmentation masks
 
 ---
 
@@ -132,11 +129,11 @@ source .venv/bin/activate
 
 **Step 1: Run Main Training & Evaluation**
 ```bash
-python train_pipeline.py
+python scripts/run_project.py
 ```
-Outputs: `comparison_report.html`, `training_curves.png`, `dataset_stats.json`
+Outputs: `metrics.json`, `metrics_summary.csv`, `pixel_classifier_training_curve.png`, and HTML galleries.
 
-**Step 2: Generate Annotation Visualizations**
+**Step 2: Generate annotation visualizations only (optional)**
 ```bash
 python visualize_annotations.py
 ```
@@ -158,14 +155,11 @@ open outputs/train_annotations.html
 
 ## Key Findings
 
-### Model Performance by Scenario
+### Reproducible Metrics
 
-| Scenario | Best Model | Accuracy | Notes |
-|----------|-----------|----------|-------|
-| Normal | Classical | 84.88% | Baseline performance |
-| Crowd Occlusion | CNN | 82.62% | Learns to infer hidden lanes |
-| Night | CNN | 78.20% | Better generalization |
-| No Markings | Classical | 75.64% | All models struggle here |
+Run `python scripts/run_project.py` to regenerate metrics for the local dataset.
+The runner automatically skips official-list entries whose images or masks are not
+present locally, so it is safe to use with a partial CULane download.
 
 ### Error Analysis
 
@@ -204,7 +198,7 @@ Lane and Road Boundary Detection/
 
 Install with:
 ```bash
-pip install numpy opencv-python matplotlib scikit-learn scipy
+pip install -r requirements.txt
 ```
 
 ---
@@ -232,7 +226,7 @@ pip install numpy opencv-python matplotlib scikit-learn scipy
 - Dataset downloaded and extracted
 - Visualizations generated
 - Dataset analysis completed
-- 3 models implemented and compared
+- 3 reproducible models implemented and compared
 - Results visualized and documented
 - Error analysis performed
 

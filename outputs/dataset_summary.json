@@ -4,16 +4,16 @@
     "total_entries": 88880,
     "unique_drivers": 3,
     "unique_frames": 88880,
-    "annotated_frames": 88587,
-    "total_lanes": 265438
+    "annotated_frames": 88880,
+    "total_lanes": 266307
   },
   "val": {
     "split_name": "val.txt",
     "total_entries": 9675,
     "unique_drivers": 1,
     "unique_frames": 9675,
-    "annotated_frames": 9610,
-    "total_lanes": 32465
+    "annotated_frames": 9675,
+    "total_lanes": 32682
   },
   "test": {
     "split_name": "test.txt",

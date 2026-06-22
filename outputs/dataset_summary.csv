@@ -1,4 +1,4 @@
 split,split_name,total_entries,unique_drivers,unique_frames,annotated_frames,total_lanes
-train,train.txt,88880,3,88880,88587,265438
-val,val.txt,9675,1,9675,9610,32465
+train,train.txt,88880,3,88880,88880,266307
+val,val.txt,9675,1,9675,9675,32682
 test,test.txt,34680,3,34680,16978,52056
